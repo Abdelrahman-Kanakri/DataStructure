@@ -1,0 +1,293 @@
+#include<iostream>
+#include<cassert>
+using namespace std;
+template<class elemType>
+class arrayList
+{
+private:
+	elemType* array;
+	elemType maxSize;
+	elemType length;
+public:
+//الي عملته هون اني رتبت الفنكشن بمكان عشان اعمل الجسم تبعهم بره الخطوات مكتوبه تحت
+	arrayList(int s);
+	arrayList(const arrayList& otherList);//copyConstructor.
+	~arrayList();
+	bool isFull();//1
+	bool isEmpty();//2
+	void insertAt(elemType pos,elemType element);//3
+	void insertAtEnd(elemType element);//4
+	void insert(elemType element);//5
+	void remove(elemType element);//6
+	void removeAt(elemType pos);//7
+    bool isItemEqual(elemType pos,elemType element);//8
+	void replaceAt(elemType pos, elemType element);//9
+	void retriveAt(elemType pos, elemType element);//10
+	void clearList();//11
+	elemType seqSearch(elemType element);//12
+	elemType getElement(elemType pos);//13
+	elemType listSize();//14
+	elemType maxListSize();//15
+    void print();//16
+};
+/*
+constructor and non-class member(Function) are away far from each other 
+from the way of calling out the template and i will right each calling way in 
+its part.
+for calling a constructor, destrctor, copy-constructor. We need to as the following:
+1) class name.
+2) need to write between the function name and the class name 2 things:
+   1- angel brackets <> and between them the template name.
+   2- :: these dots.
+3) function name with its parameters.
+*/
+
+/*
+اول كونسترتر بقدر اسميه نقطه التعريف بحيث بحدد كلشي بدي اياه عن 
+طريقه وتقريبا مابدو شرح
+new int بس الي لازم تعرفو انه كلمه 
+Memory انه انا بطلب من ال
+يعطيني مساحه من عنده تكفي الشغل الي بدي اياه.
+وبالنسبه لاخر خط او سطر فبطلت شغله المساحه تاثر على الاجهزه الحديثه فما داعي الها 
+ cassert لكن نحطها مع تعريف مكتبه اسمها  
+*/
+template<class elemType>
+arrayList<elemType>::arrayList(int s)
+{
+	if (s < 10)
+		maxSize = 10;//by default.
+	else
+		maxSize = s;
+	length = 0;
+	array = new int[maxSize];
+	assert(array != NULL);//for warnings there no allocated memory
+
+}
+/*
+الكوبي كوسنتركتر بقوم بعمليه نسخ الليست كامله لليست ثانيه بشرط تعريف اوبجيكت 
+داخل الباراميتر تبع الكوبي كونستركتر.
+وطريقه تعريف كوبي كونستركتر سهله بس بدك شغلتين
+const كلمه
+& علامه الادريس
+وطبعا بدنا نعرف اوبجيكت جوا الباراميتر ونعمل الشغل الطبيعي الي 
+كنا بنعمله كل مره
+*/
+template<class elemType>
+arrayList<elemType>::arrayList(const arrayList& otherlist)//copy constructor
+{
+	maxSize = otherlist.maxSize;
+	length = otherlist.length;
+	array = new int[maxSize];
+	assert(array != NULL);
+	for (int j = 0;j < length;j++)
+	{
+		array[j] = otherlist.array[j];
+	}
+}
+/*
+ desconstructor بنعرف شو بعمل
+ بدمر الكلاش من تحت لفوق وينادى بمجرد اغلاق قوس المجموعه تلقائيا
+ وهون انا قلتله اعمل ديليت للاراي بس تخلص شغل عشان ما ياخد مساحه عالفاضي
+ */
+template<class elemType>
+arrayList<elemType>::~arrayList()//destructor
+{
+	delete[]array;
+}
+/*
+when wants to write a full bodyFunction out of a template,
+u have to do the following:
+WARNINGS: you need to the same thing with each function.
+1) template prototype.
+2) need the datatype of it.
+3) class name
+4) <>:angle brackets, and between them the template name.
+5) :: these dots
+6) function name and its body with their parameter if any.
+*/
+
+//1
+template<class elemType>
+bool arrayList<elemType>::isFull()//هون فنكشن بولين يعني برجع ترو او فولس اذا تحقق
+                                 //الشرط نفس الحكي بالنسبه للفنكشن الي تحته
+{
+	return length == maxSize;
+}
+
+//2
+template<class elemType>
+bool arrayList<elemType>::isEmpty()
+{
+	return length == 0;
+}
+
+//3
+template<class elemType>
+void arrayList<elemType>::insertAt(elemType pos,elemType element)
+{
+	if (isFull())
+		cout << "The list is full" << endl;
+	else if (pos <0 || pos>length)
+		cout << "OUT OF RANGE!... " << endl;
+	else
+	{
+		for (int i = length;i>pos;i--)
+		{
+			array[i] = array[i - 1];
+		}
+		array [pos] = element;
+		length++;
+	}
+}
+
+//4
+template<class elemType>
+void arrayList<elemType>::insertAtEnd( elemType element)
+{
+	if (isFull())
+		cout << "The list is full" << endl;
+	else
+		array[length++] = element;//بعد ما يخلص من العمليه length بزود على 
+}
+
+//5
+template<class elemType>
+void arrayList<elemType>::insert(elemType element)
+{
+	
+	if (length == 0)
+		array[length++] = element;
+	else if (length == maxSize)
+		cout << "the list is full" << endl;
+	else
+	{ 
+		int pos = seqSearch(element);
+		if (pos == -1)
+			array[length++] = element;
+		else
+			cout << "The element is already in the list" << endl;
+	}
+}
+
+//6
+template<class elemType>
+void arrayList<elemType>::remove(elemType element)
+{
+	   
+		if (isEmpty())
+			cout << "Cant delete form empty list" << endl;
+		else
+		{
+			int pos = seqSearch(element);
+			if (pos != -1)
+				removeAt(pos);
+			else
+				cout << "the element that u want to delete is unavialable" << endl;
+		}
+}
+
+//7
+template<class elemType>
+void arrayList<elemType>::removeAt(elemType pos)
+{
+	if (isEmpty())//هون بتاكد من الليست اذا فل ولا لا
+		cout << "Cant remove from empty list" << endl;
+	else if (pos<0 || pos>length)//طبعا مستحيل انا اشيل بمكان والمكان مش ضمن الرينج  
+		cout << "OUT OF RANGE!..." << endl;
+	else
+		for (int i = pos;i < length;i++)//الشغل كله هون هسه، لو بدنا نشيل ايتم معين 
+			//الي راح يصير كالتالي، بدنا نعمل شيفتينج لليسار بحيث الايتم المطلوب يحذف
+		{
+			array[i] = array[i + 1];
+		}
+	length--;//وبس يشيل الايتم المحذوف بنقص من عدد الايتم الموجودين بالليستش	
+}
+
+//8
+template<class elemType>
+bool arrayList<elemType>::isItemEqual(elemType pos,elemType element)
+{
+	return (array[pos] == element);
+}
+
+//9
+template<class elemType>
+void arrayList<elemType>::replaceAt(elemType pos, elemType element)
+{
+	if (pos<0 || pos>length)
+		cout << "OUT OF RANGE!..." << endl;
+	else
+		array[pos] = element;
+}
+
+//10
+template<class elemType>
+void arrayList<elemType>::retriveAt(elemType pos,elemType element)
+{
+	if (pos < 0 || pos > length)
+		cout << "Out of Range " << endl;
+	else
+		element = list[pos];
+}
+//11
+template<class elemType>
+void arrayList<elemType>::clearList()
+{
+	 length = 0;
+}
+//12
+template<class elemType>
+elemType arrayList<elemType>::seqSearch(elemType element)
+{
+	
+	for (int i = 0;i < length;i++)
+	{
+		if (array[i] == element)
+			return i;
+	}
+		return -1;
+}
+
+//13
+template<class elemType>
+elemType arrayList<elemType>::getElement(elemType pos)
+{
+	if (pos<0 || pos>length)
+		cout << "OUT OF RANGE!..." << endl;
+	else
+		return array[pos];
+}
+
+//14
+template<class elemType>
+elemType arrayList<elemType>::listSize()
+{
+	return length;
+}
+//15
+template<class elemType>
+elemType arrayList<elemType>::maxListSize()
+{
+	return maxSize;
+}
+
+//16
+template<class elemType>
+void arrayList<elemType>::print()
+{
+	for (int i = 0; i < length; i++)
+	{
+		cout << array[i] << " ";
+	}
+	cout<<endl;
+}
+int main()
+{
+	//لما بدنا نعرف اوبجيكت لازم نسوي كم شغله هنه
+	//انه نكتب اسم الكلاس تبعنا 
+	//ونكتب اسم الاوبجيكت تبعنا لكن في شي ناقص بكون وهو التيمبلت تعبنا
+	//وعشان ما يكون في ايرور لازم يكون في قوسين زوايا بينهم نوع او الداتا تايب
+	// الي بدنا اياه لهاي الاراي ومنها بنحدد باقي الداتا تايب لكل الشغل تبعنا
+	//<> هدول هنه قوسين الزوايا
+	
+}
