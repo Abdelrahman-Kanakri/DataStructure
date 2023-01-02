@@ -1,0 +1,328 @@
+#include <iostream>
+#include <cassert>
+using namespace std;
+
+struct nodeType
+{
+    int info;
+    nodeType* link;
+};
+class linkedListType
+{
+public:
+    const linkedListType& operator=(const linkedListType&);
+    void initializeList();
+    bool isEmptyList() const;
+    void print() const;
+    int length() const;
+    void destroyList();
+    int front() const;
+    int back() const;
+    virtual bool search(const int& searchItem) const = 0;
+    virtual void insertFirst(const int& newItem) = 0;
+    virtual void insertLast(const int& newItem) = 0;
+    virtual void deleteNode(const int& deleteItem) = 0;
+    linkedListType();
+    linkedListType(const linkedListType& otherList);
+    ~linkedListType();
+protected:
+    int count;
+    nodeType* first;
+    nodeType* last;
+private:
+    void copyList(const linkedListType& otherList);
+};
+
+
+bool linkedListType::isEmptyList() const
+{
+    return (first == NULL);
+}
+
+
+linkedListType::linkedListType() 
+{
+    first = NULL;
+    last = NULL;
+    count = 0;
+}
+
+
+void linkedListType::destroyList()
+{
+    nodeType* temp;   
+    while (first != NULL)   
+    {
+        temp = first;       
+        first = first->link; 
+        delete temp;   
+    }
+
+    last = NULL; 
+    count = 0;
+}
+
+
+void linkedListType::initializeList()
+{
+    destroyList(); 
+}
+
+
+void linkedListType::print() const
+{
+    nodeType* current; 
+
+    current = first;    
+    
+    while (current != NULL) 
+    {
+        cout << current->info << " ";
+        current = current->link;
+
+    }
+}
+
+
+int linkedListType::length() const
+{
+    return count;
+}  
+
+
+int linkedListType::front() const
+{
+    assert(first != NULL);
+
+    return first->info; 
+}
+
+
+int linkedListType::back() const
+{
+    assert(last != NULL);
+
+    return last->info;
+}
+
+
+
+void linkedListType::copyList(const linkedListType& otherList)
+{
+    if (first != NULL) 
+        destroyList();
+
+    if (otherList.first == NULL) 
+    {
+        first = NULL;
+        last = NULL;
+        count = 0;
+    }
+    else
+    {
+        count = otherList.count;
+
+        nodeType* newNode; 
+        nodeType* current; 
+        current = otherList.first; 
+     
+
+        first = new nodeType;  
+
+        first->info = current->info; 
+        first->link = NULL;       
+        last = first;              
+       
+        current = current->link;     
+        
+
+
+        while (current != NULL)
+        {
+            newNode = new nodeType;  
+            newNode->info = current->info; 
+            newNode->link = NULL;       
+            last->link = newNode;  
+            last = newNode;       
+            current = current->link;   
+            
+        }
+    }
+}
+
+
+linkedListType::~linkedListType() 
+{
+    destroyList();
+}
+
+linkedListType::linkedListType(const linkedListType& otherList)
+{
+    first = NULL;
+    copyList(otherList);
+}
+
+
+const linkedListType& linkedListType::operator=(const linkedListType& otherList)
+{
+    if (this != &otherList) 
+    {
+        copyList(otherList);
+    }
+
+    return *this;
+}
+
+class unorderedLinkedList : public linkedListType
+{
+public:
+    bool search(const int& searchItem) const;
+    void insertFirst(const int& newItem);
+    void insertLast(const int& newItem);
+    void deleteNode(const int& deleteItem);
+    void reversePrint();// من عندي
+};
+
+
+
+bool unorderedLinkedList::search(const int& searchItem) const
+{
+    nodeType* current; 
+    bool found = false;
+
+    current = first; 
+
+    while (current != NULL && !found)    
+        if (current->info == searchItem) 
+            found = true;
+        else
+            current = current->link; 
+    
+    return found;
+}
+
+void unorderedLinkedList::insertFirst(const int& newItem)
+{
+    nodeType* newNode; 
+
+    newNode = new nodeType; 
+    newNode->info = newItem;  
+    newNode->link = first;     
+    first = newNode;           
+    count++;                    
+
+    if (last == NULL)   
+        last = newNode;
+}
+
+
+void unorderedLinkedList::insertLast(const int& newItem)
+{
+    nodeType* newNode; 
+
+    newNode = new nodeType; 
+
+    newNode->info = newItem;  
+    newNode->link = NULL;     
+
+    if (first == NULL)  
+    {
+        first = newNode;
+        last = newNode;
+        count++;        
+    }
+    else    
+    {
+        last->link = newNode; 
+        last = newNode; 
+        count++;       
+    }
+}
+
+
+void unorderedLinkedList::deleteNode(const int& deleteItem)
+{
+    nodeType* current; 
+    nodeType* trailCurrent; 
+    bool found;
+
+    if (first == NULL)   
+        cout << "Cannot delete from an empty list."
+        << endl;
+    else
+    {
+        if (first->info == deleteItem) 
+        {
+            current = first;
+            first = first->link;
+            count--;
+            if (first == NULL)    
+                last = NULL;
+            delete current;
+        }
+        else 
+        {
+            found = false;
+            trailCurrent = first; 
+            current = first->link; 
+
+            while (current != NULL && !found)
+            {
+                if (current->info != deleteItem)
+                {
+                    trailCurrent = current;
+                    current = current->link;
+                }
+                else
+                    found = true;
+            }
+
+            if (found) 
+            {
+                trailCurrent->link = current->link;
+                count--;
+
+                if (last == current)   
+                    
+                    last = trailCurrent; 
+                delete current;  
+            }
+            else
+                cout << "The item to be deleted is not in "
+                << "the list." << endl;
+        }
+    }
+}
+void unorderedLinkedList::reversePrint()
+{
+        nodeType* prev, * next, * curr;
+        prev = NULL;
+        curr = first;
+        next = curr->link;
+       
+        while (curr != NULL)
+        {
+            next = curr->link;
+            curr->link = prev;
+            prev = curr;
+            curr = next;
+           
+        }
+        first = prev;
+}
+int main()
+{
+    unorderedLinkedList l;
+    l.insertFirst(20);
+    l.insertLast(18);
+    l.insertLast(14);
+    l.insertLast(8);
+    l.insertLast(2);
+    l.insertLast(0);
+    l.reversePrint();
+    l.deleteNode(8);
+    l.print();
+
+
+    return 0;
+}
