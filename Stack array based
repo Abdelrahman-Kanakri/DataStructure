@@ -1,0 +1,85 @@
+#include<iostream>
+using namespace std;
+const int MAX_SIZE = 100;
+template<class t>
+class stack {
+	int stackTop;
+	t item[MAX_SIZE];
+public:
+	stack() 
+	{
+		stackTop = 0;
+	}
+	bool isEmpty()
+	{
+		return stackTop == 0;
+	}
+	bool isFull()
+	{
+		return stackTop == MAX_SIZE;
+	}
+
+	void push(t Element)
+	{
+		if (stackTop >= MAX_SIZE)
+		{
+			cout << "Stack full on push" << endl;
+		}
+		else
+		{
+			item[stackTop++] = Element;
+			//stackTop++;
+		}
+	}
+	void pop()
+	{
+		if (isEmpty())
+			cout << "stack empty on pop" << endl;
+		else
+			stackTop--;
+	}
+	void pop(t& Element)
+	{
+		if (isEmpty())
+			cout << "stack empty on pop" << endl;
+		else {
+			Element = item[stackTop];
+			stackTop--;
+			cout << "The deleted item: " << Element << endl;
+		}
+	}
+	void getTop(t& Top)
+	{
+		if (isEmpty())
+			cout << "stack empty on getTop" << endl;
+		else {
+			Top = item[stackTop - 1];
+			cout << "The top is : " << Top << endl;
+		}
+	}
+	void print() {
+		cout << "[ ";
+		for (int i = stackTop - 1; i >= 0; i--)
+		{
+			cout << item[i] << " ";
+		}
+		cout << "]";
+		cout << endl;
+
+	}
+	void length()
+	{
+		cout << "The number of elements in the stack is : " << stackTop;
+	}
+};
+int main() {
+	stack<int>s;
+	int x = 0;
+	s.push(5);
+	s.push(15);
+	s.push(20);
+	s.push(30);
+	s.print();
+	s.getTop(x);
+	s.length();
+}
