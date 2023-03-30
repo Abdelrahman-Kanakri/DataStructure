@@ -227,7 +227,7 @@ void arrayList<elemType>::retriveAt(elemType pos,elemType element)
 	if (pos < 0 || pos > length)
 		cout << "Out of Range " << endl;
 	else
-		element = list[pos];
+		element = array[pos];
 }
 //11
 template<class elemType>
